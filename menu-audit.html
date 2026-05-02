@@ -186,7 +186,6 @@
 
 <script>
 // ─── CONFIG ────────────────────────────────────────────────────────────────────
-// Update these two values before deploying.
 const WORKER_URL   = "https://menu-audit-worker.tim-475.workers.dev";
 const WORKER_TOKEN = "I0l6TOjQFqpPSfUVC2JricKNZBD7M4Y9mXu1LWb5";
 
@@ -250,9 +249,7 @@ async function handlePaste(e) {
 }
 
 async function pasteFromClipboard() {
-  // navigator.clipboard.read() requires a user gesture — this button provides it
   if (!navigator.clipboard || !navigator.clipboard.read) {
-    // Fallback: open file picker
     document.getElementById("fileInput").click();
     return;
   }
@@ -270,11 +267,9 @@ async function pasteFromClipboard() {
       }
     }
     if (!found) {
-      // Nothing image-like in clipboard — open file picker instead
       document.getElementById("fileInput").click();
     }
   } catch (err) {
-    // Permission denied or clipboard empty — fall back to file picker
     document.getElementById("fileInput").click();
   }
   checkSend();
@@ -323,9 +318,11 @@ function inline(s) {
     .replace(/`([^`\n]+)`/g, "<code>$1</code>");
 }
 
+// FIX: rewritten md() function
+// - Strips stray HTML tags Claude occasionally outputs (</ul>, <ul>, </ol> etc.)
+// - List items now run through inline() so **bold** renders correctly inside bullets
 function md(text) {
   // Strip any raw HTML tags Claude may have leaked into its output
-  // (e.g. </ul>, <ul>, </ol>, <li> as raw text)
   text = text.replace(/<\/?(ul|ol|li|div|span|br|p)(\s[^>]*)?>/gi, "");
 
   const lines = text.split("\n");
@@ -363,6 +360,7 @@ function md(text) {
     .replace(/^## (.+)$/gm,  "<h3>$1</h3>")
     .replace(/^# (.+)$/gm,   "<h3>$1</h3>")
     .replace(/^---+$/gm, "<hr>")
+    // FIX: list items now pass content through inline() so bold/italic renders
     .replace(/^[*-] (.+)$/gm, (_, content) => `<li>${inline(content)}</li>`)
     .replace(/^\d+\. (.+)$/gm, (_, content) => `<li>${inline(content)}</li>`)
     .replace(/(<li>.*<\/li>\n?)+/g, m => "<ul>" + m + "</ul>");
@@ -420,15 +418,12 @@ async function sendMessage() {
   if (!text && !files.length) return;
   if (tokensUsed >= TOKEN_LIMIT) return;
 
-  // Preview URLs for images
   for (const f of files) {
     if (f.type && f.type.startsWith("image/")) f._previewUrl = URL.createObjectURL(f);
   }
 
-  // Show user message
   appendMsg("user", md(text || (files.length === 1 ? files[0].name : files.length + " files")), files);
 
-  // Reset input
   inputEl.value = "";
   inputEl.style.height = "auto";
   pendingFiles = [];
@@ -436,16 +431,13 @@ async function sendMessage() {
   isStreaming = true;
   checkSend();
 
-  // Build message for history
   const userMsg = { role: "user", content: text || (files.length ? "[Attached files]" : "") };
   history.push(userMsg);
 
-  // FormData — files sent as multipart, messages as JSON field
   const fd = new FormData();
   fd.append("messages", JSON.stringify(history));
   for (const f of files) fd.append("files", f, f.name);
 
-  // Show typing dots
   const msgs = document.getElementById("messages");
   const typingWrap = document.createElement("div");
   typingWrap.className = "msg assistant";
@@ -470,7 +462,6 @@ async function sendMessage() {
       throw new Error(errMsg);
     }
 
-    // Create streaming bubble
     const streamWrap = document.createElement("div");
     streamWrap.className = "msg assistant";
     streamWrap.innerHTML = `<div class="msg-bubble"><span class="cursor"></span></div>
@@ -479,7 +470,6 @@ async function sendMessage() {
     streamBubble = streamWrap.querySelector(".msg-bubble");
     scrollBottom();
 
-    // Parse SSE
     const reader  = res.body.getReader();
     const decoder = new TextDecoder();
     let buf = "";
@@ -489,9 +479,8 @@ async function sendMessage() {
       if (done) break;
       buf += decoder.decode(value, { stream: true });
 
-      // Split on double newline (SSE event separator)
       const events = buf.split("\n\n");
-      buf = events.pop(); // keep trailing incomplete chunk
+      buf = events.pop();
 
       for (const evt of events) {
         const dataLine = evt.split("\n").find(l => l.startsWith("data: "));
@@ -502,7 +491,6 @@ async function sendMessage() {
         let p;
         try { p = JSON.parse(raw); } catch { continue; }
 
-        // Anthropic streaming events
         if (p.type === "content_block_delta" && p.delta?.type === "text_delta") {
           accumulated += p.delta.text;
           streamBubble.innerHTML = md(accumulated) + '<span class="cursor"></span>';
@@ -519,14 +507,12 @@ async function sendMessage() {
           updateTokenBar();
         }
 
-        // Custom worker event
         if (p.type === "fc_usage" && p.remaining_tokens !== undefined) {
           updateTokenBar(TOKEN_LIMIT - p.remaining_tokens);
         }
       }
     }
 
-    // Final — remove cursor
     streamBubble.innerHTML = md(accumulated);
     scrollBottom();
     history.push({ role: "assistant", content: accumulated });
@@ -544,7 +530,7 @@ async function sendMessage() {
   checkSend();
 }
 
-// ─── Init ───────────────────────────────────────────────────────────────────
+// ─── Init ─────────────────────────────────────────────────────────────────────
 window.addEventListener('load', checkSend);
 
 // ─── Drag and drop ────────────────────────────────────────────────────────────
