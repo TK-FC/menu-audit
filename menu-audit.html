@@ -246,6 +246,7 @@ async function handlePaste(e) {
       if (f) addFile(Object.assign(f, { name: f.name || "pasted-image.png" }));
     }
   }
+  checkSend();
 }
 
 async function pasteFromClipboard() {
@@ -276,6 +277,7 @@ async function pasteFromClipboard() {
     // Permission denied or clipboard empty — fall back to file picker
     document.getElementById("fileInput").click();
   }
+  checkSend();
 }
 
 function handleFileSelect(e) {
@@ -538,6 +540,9 @@ async function sendMessage() {
   isStreaming = false;
   checkSend();
 }
+
+// ─── Init ───────────────────────────────────────────────────────────────────
+window.addEventListener('load', checkSend);
 
 // ─── Drag and drop ────────────────────────────────────────────────────────────
 const overlay  = document.getElementById("dropOverlay");
