@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu Audit — Foodie Coaches</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --fc-green: #2D6A4F;
+    --fc-green-light: #40916C;
+    --fc-green-pale: #D8F3DC;
+    --fc-green-dark: #1B4332;
+    --fc-cream: #FAFAF7;
+    --fc-border: #E8E8E2;
+    --fc-text: #1C1C1A;
+    --fc-muted: #6B6B65;
+    --fc-white: #FFFFFF;
+    --fc-danger: #C53030;
+    --fc-warning-bg: #FFF8E1;
+    --fc-warning-border: #F9C846;
+    --fc-warning-text: #7B5E0F;
+  }
+
+  html, body { height: 100%; font-family: Georgia, 'Times New Roman', serif; background: var(--fc-cream); color: var(--fc-text); }
+  .app { display: flex; flex-direction: column; height: 100vh; max-width: 860px; margin: 0 auto; }
+
+  .header { padding: 16px 22px 13px; border-bottom: 1px solid var(--fc-border); background: var(--fc-white); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .logo-mark { width: 34px; height: 34px; background: var(--fc-green); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header-text h1 { font-size: 15px; font-weight: 700; font-family: Georgia, serif; letter-spacing: -0.2px; }
+  .header-text p { font-size: 11px; color: var(--fc-muted); font-family: -apple-system, 'Helvetica Neue', sans-serif; margin-top: 1px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .header-badge { margin-left: auto; font-size: 10px; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: var(--fc-green); background: var(--fc-green-pale); padding: 3px 9px; border-radius: 20px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; }
+
+  .messages { flex: 1; overflow-y: auto; padding: 26px 22px 14px; display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth; }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--fc-border); border-radius: 2px; }
+
+  .token-bar { flex-shrink: 0; padding: 5px 22px; background: var(--fc-white); border-top: 1px solid var(--fc-border); display: flex; align-items: center; gap: 8px; }
+  .token-label { font-size: 11px; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: var(--fc-muted); flex-shrink: 0; }
+  .token-track { flex: 1; height: 3px; background: var(--fc-border); border-radius: 2px; overflow: hidden; }
+  .token-fill { height: 100%; background: var(--fc-green); border-radius: 2px; transition: width 0.5s ease; }
+  .token-fill.warn { background: #D69E2E; }
+  .token-fill.danger { background: var(--fc-danger); }
+  .token-count { font-size: 11px; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: var(--fc-muted); flex-shrink: 0; min-width: 82px; text-align: right; }
+
+  .msg { display: flex; flex-direction: column; max-width: 88%; }
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg.assistant { align-self: flex-start; align-items: flex-start; }
+
+  .msg-bubble { padding: 12px 15px; border-radius: 14px; font-size: 14.5px; line-height: 1.65; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
+  .msg.user .msg-bubble { background: var(--fc-green); color: #fff; border-bottom-right-radius: 4px; }
+  .msg.assistant .msg-bubble { background: var(--fc-white); border: 1px solid var(--fc-border); color: var(--fc-text); border-bottom-left-radius: 4px; }
+
+  .msg-bubble p { margin: 0 0 9px; }
+  .msg-bubble p:last-child { margin-bottom: 0; }
+  .msg-bubble strong { font-weight: 600; }
+  .msg-bubble em { font-style: italic; }
+  .msg-bubble code { font-family: monospace; font-size: 13px; background: var(--fc-cream); padding: 1px 4px; border-radius: 3px; }
+  .msg-bubble h3 { font-family: Georgia, serif; font-size: 14.5px; font-weight: 700; margin: 15px 0 7px; color: var(--fc-green-dark); padding-bottom: 4px; border-bottom: 1px solid var(--fc-border); }
+  .msg-bubble h3:first-child { margin-top: 0; }
+  .msg-bubble ul, .msg-bubble ol { padding-left: 18px; margin: 5px 0; }
+  .msg-bubble li { margin-bottom: 4px; }
+  .msg-bubble hr { border: none; border-top: 1px solid var(--fc-border); margin: 11px 0; }
+  .msg-bubble table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 10px 0; }
+  .msg-bubble th { background: var(--fc-green-pale); color: var(--fc-green-dark); font-weight: 600; padding: 6px 9px; text-align: left; border: 1px solid #B7E4C7; }
+  .msg-bubble td { padding: 5px 9px; border: 1px solid var(--fc-border); vertical-align: top; }
+  .msg-bubble tr:nth-child(even) td { background: #FAFAFA; }
+  .msg-time { font-size: 10.5px; color: var(--fc-muted); font-family: -apple-system, 'Helvetica Neue', sans-serif; margin-top: 4px; padding: 0 3px; }
+
+  .cursor { display: inline-block; width: 2px; height: 14px; background: var(--fc-green); margin-left: 2px; vertical-align: text-bottom; animation: blink 0.8s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .typing { display: flex; align-items: center; gap: 5px; padding: 12px 15px; background: var(--fc-white); border: 1px solid var(--fc-border); border-radius: 14px; border-bottom-left-radius: 4px; }
+  .typing span { width: 6px; height: 6px; background: var(--fc-green-light); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+  .attach-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 6px; max-width: 480px; }
+  .attach-chip { display: flex; align-items: center; gap: 5px; background: var(--fc-white); border: 1px solid var(--fc-border); border-radius: 8px; padding: 4px 9px; font-size: 12px; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: var(--fc-text); max-width: 200px; }
+  .attach-chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .attach-img-preview { max-width: 240px; max-height: 160px; border-radius: 10px; border: 1px solid var(--fc-border); object-fit: cover; }
+
+  .input-area { flex-shrink: 0; padding: 10px 15px 15px; background: var(--fc-white); border-top: 1px solid var(--fc-border); }
+  .limit-warning { background: var(--fc-warning-bg); border: 1px solid var(--fc-warning-border); border-radius: 9px; padding: 9px 12px; font-size: 13px; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: var(--fc-warning-text); margin-bottom: 8px; }
+  .file-queue { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
+  .file-queue-item { display: flex; align-items: center; gap: 5px; background: var(--fc-cream); border: 1px solid var(--fc-border); border-radius: 8px; padding: 4px 9px; font-size: 12px; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
+  .file-queue-item button { background: none; border: none; cursor: pointer; color: var(--fc-muted); font-size: 15px; padding: 0; line-height: 1; }
+  .file-queue-item button:hover { color: var(--fc-danger); }
+
+  .input-row { display: flex; gap: 8px; align-items: flex-end; }
+  .input-box { flex: 1; display: flex; align-items: flex-end; gap: 7px; background: var(--fc-cream); border: 1.5px solid var(--fc-border); border-radius: 12px; padding: 7px 10px; transition: border-color 0.15s; }
+  .input-box:focus-within { border-color: var(--fc-green); background: var(--fc-white); }
+  .attach-btn { background: none; border: none; cursor: pointer; color: var(--fc-muted); padding: 2px; display: flex; align-items: center; flex-shrink: 0; transition: color 0.15s; }
+  .attach-btn:hover { color: var(--fc-green); }
+  textarea { flex: 1; border: none; background: none; resize: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 14px; color: var(--fc-text); outline: none; line-height: 1.5; max-height: 120px; min-height: 20px; padding: 0; }
+  textarea::placeholder { color: var(--fc-muted); }
+  .send-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--fc-green); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, transform 0.1s; }
+  .send-btn:hover { background: var(--fc-green-dark); }
+  .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled { background: var(--fc-border); cursor: not-allowed; }
+
+  input[type="file"] { display: none; }
+
+  .drop-overlay { position: fixed; inset: 0; background: rgba(45,106,79,0.08); border: 3px dashed var(--fc-green); border-radius: 12px; display: none; align-items: center; justify-content: center; z-index: 100; pointer-events: none; }
+  .drop-overlay.active { display: flex; }
+  .drop-overlay-text { font-size: 18px; font-family: Georgia, serif; color: var(--fc-green); font-weight: 700; }
+
+  .intro-bubble { background: linear-gradient(135deg, #F0FFF4, #E8F5E9) !important; border-color: #B7E4C7 !important; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="logo-mark">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M12 3C8 3 5 6 5 9c0 2.5 1.5 4.5 3.5 5.5L8 20h8l-.5-5.5C17.5 13.5 19 11.5 19 9c0-3-3-6-7-6z" fill="white" opacity="0.9"/>
+        <path d="M9 20h6M10 17h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Menu Audit</h1>
+      <p>Foodie Coaches — Menu Optimisation</p>
+    </div>
+    <div class="header-badge">AI-Powered</div>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="msg assistant">
+      <div class="msg-bubble intro-bubble">
+        Upload your menu — photo, scan, PDF, or spreadsheet — and I'll audit it across five areas: strategic item selection, pricing, psychology, layout, and upsell opportunities.<br><br>You'll get a prioritised action list you can act on this week. Use the paperclip to attach files, or paste or drag images directly in.
+      </div>
+      <div class="msg-time">Menu Advisor</div>
+    </div>
+  </div>
+
+  <div class="token-bar">
+    <span class="token-label">Session</span>
+    <div class="token-track"><div class="token-fill" id="tokenFill" style="width:0%"></div></div>
+    <span class="token-count" id="tokenCount">0 / 100k tokens</span>
+  </div>
+
+  <div class="input-area">
+    <div id="limitWarning" class="limit-warning" style="display:none">
+      You're approaching the session limit. Start a new conversation to continue.
+    </div>
+    <div class="file-queue" id="fileQueue"></div>
+    <div class="input-row">
+      <div class="input-box">
+        <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Attach file">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+          </svg>
+        </button>
+        <textarea id="userInput" placeholder="Type a message or paste an image…" rows="1"
+          oninput="autoResize(this); checkSend()"
+          onkeydown="handleKey(event)"
+          onpaste="handlePaste(event)"></textarea>
+      </div>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled title="Send">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="drop-overlay" id="dropOverlay">
+  <div class="drop-overlay-text">Drop your menu here</div>
+</div>
+
+<input type="file" id="fileInput" multiple accept="image/*,.pdf,.xlsx,.xls,.csv" onchange="handleFileSelect(event)">
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────────────
+// Update these two values before deploying.
+const WORKER_URL   = "https://menu-audit-worker.tim-475.workers.dev";
+const WORKER_TOKEN = "I0l6TOjQFqpPSfUVC2JricKNZBD7M4Y9mXu1LWb5";
+
+// ─── State ────────────────────────────────────────────────────────────────────
+const TOKEN_LIMIT = 100_000;
+const TOKEN_WARN  =  80_000;
+let history      = [];
+let pendingFiles = [];
+let tokensUsed   = 0;
+let isStreaming  = false;
+
+// ─── Textarea helpers ─────────────────────────────────────────────────────────
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, 120) + "px";
+}
+
+function checkSend() {
+  const inp = document.getElementById("userInput");
+  const btn = document.getElementById("sendBtn");
+  btn.disabled = isStreaming
+    || (inp.value.trim() === "" && pendingFiles.length === 0)
+    || tokensUsed >= TOKEN_LIMIT;
+}
+
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    if (!document.getElementById("sendBtn").disabled) sendMessage();
+  }
+}
+
+function scrollBottom() {
+  const m = document.getElementById("messages");
+  m.scrollTop = m.scrollHeight;
+}
+
+// ─── Token bar ────────────────────────────────────────────────────────────────
+function updateTokenBar(used) {
+  if (used !== undefined) tokensUsed = used;
+  const pct = Math.min((tokensUsed / TOKEN_LIMIT) * 100, 100);
+  document.getElementById("tokenFill").style.width = pct + "%";
+  document.getElementById("tokenFill").className =
+    "token-fill" + (pct > 90 ? " danger" : pct > 70 ? " warn" : "");
+  document.getElementById("tokenCount").textContent =
+    (tokensUsed >= 1000 ? (tokensUsed/1000).toFixed(1) + "k" : tokensUsed) + " / 100k tokens";
+  document.getElementById("limitWarning").style.display =
+    tokensUsed > TOKEN_WARN ? "block" : "none";
+}
+
+// ─── File handling ────────────────────────────────────────────────────────────
+async function handlePaste(e) {
+  for (const item of (e.clipboardData?.items || [])) {
+    if (item.type.startsWith("image/")) {
+      e.preventDefault();
+      const f = item.getAsFile();
+      if (f) addFile(Object.assign(f, { name: f.name || "pasted-image.png" }));
+    }
+  }
+}
+
+function handleFileSelect(e) {
+  for (const f of e.target.files) addFile(f);
+  e.target.value = "";
+}
+
+function addFile(f) {
+  pendingFiles.push(f);
+  renderQueue();
+  checkSend();
+}
+
+function removeFile(i) {
+  pendingFiles.splice(i, 1);
+  renderQueue();
+  checkSend();
+}
+
+function renderQueue() {
+  const c = document.getElementById("fileQueue");
+  c.innerHTML = pendingFiles.map((f, i) => {
+    const icon = f.type && f.type.startsWith("image/") ? "🖼"
+      : /\.(xlsx|xls|csv)$/i.test(f.name) ? "📊"
+      : /\.pdf$/i.test(f.name) ? "📄" : "📎";
+    return `<div class="file-queue-item">
+      <span>${icon}</span>
+      <span style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span>
+      <button onclick="removeFile(${i})" title="Remove">×</button>
+    </div>`;
+  }).join("");
+}
+
+// ─── HTML helpers ─────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function inline(s) {
+  return esc(s)
+    .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*\n]+)\*/g, "<em>$1</em>")
+    .replace(/`([^`\n]+)`/g, "<code>$1</code>");
+}
+
+function md(text) {
+  const lines = text.split("\n");
+  const out = [];
+  let tableRows = [], inTable = false, headerDone = false;
+
+  function flushTable() {
+    if (!tableRows.length) return;
+    out.push("<table>" + tableRows.join("") + "</table>");
+    tableRows = []; inTable = false; headerDone = false;
+  }
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    const isRow = /^\|.+\|$/.test(line);
+    const isSep = /^\|[\s|:-]+\|$/.test(line);
+
+    if (isSep) { headerDone = true; continue; }
+
+    if (isRow) {
+      inTable = true;
+      const cells = line.slice(1,-1).split("|").map(c => c.trim());
+      const tag = headerDone ? "td" : "th";
+      tableRows.push("<tr>" + cells.map(c => `<${tag}>${inline(c)}</${tag}>`).join("") + "</tr>");
+      continue;
+    }
+
+    if (inTable) flushTable();
+    out.push(raw);
+  }
+  if (inTable) flushTable();
+
+  let html = out.join("\n")
+    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+    .replace(/^## (.+)$/gm,  "<h3>$1</h3>")
+    .replace(/^# (.+)$/gm,   "<h3>$1</h3>")
+    .replace(/^---+$/gm, "<hr>")
+    .replace(/^[*-] (.+)$/gm, "<li>$1</li>")
+    .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
+    .replace(/(<li>[\s\S]*?<\/li>\n?)+/g, m => "<ul>" + m + "</ul>");
+
+  // Paragraphs
+  const segs = html.split("\n");
+  const final = [];
+  let para = [];
+  const isBlock = s => /^<(h[123]|ul|ol|li|hr|table|tr|th|td)/.test(s.trim()) || s.trim() === "";
+
+  for (const seg of segs) {
+    if (isBlock(seg)) {
+      if (para.length) { final.push("<p>" + para.join("<br>") + "</p>"); para = []; }
+      if (seg.trim()) final.push(seg);
+    } else {
+      para.push(inline(seg));
+    }
+  }
+  if (para.length) final.push("<p>" + para.join("<br>") + "</p>");
+  return final.join("\n");
+}
+
+// ─── Append a completed message ───────────────────────────────────────────────
+function appendMsg(role, htmlContent, files) {
+  const msgs = document.getElementById("messages");
+  const wrap = document.createElement("div");
+  wrap.className = "msg " + role;
+
+  let inner = "";
+  if (files && files.length) {
+    inner += '<div class="attach-row">';
+    for (const f of files) {
+      if (f._previewUrl) {
+        inner += `<img class="attach-img-preview" src="${f._previewUrl}" alt="${esc(f.name)}">`;
+      } else {
+        const icon = /\.(xlsx|xls|csv)$/i.test(f.name) ? "📊" : /\.pdf$/i.test(f.name) ? "📄" : "📎";
+        inner += `<div class="attach-chip"><span>${icon}</span><span class="attach-chip-name">${esc(f.name)}</span></div>`;
+      }
+    }
+    inner += "</div>";
+  }
+  inner += `<div class="msg-bubble">${htmlContent}</div>`;
+  inner += `<div class="msg-time">${role === "user" ? "You" : "Menu Advisor"} · ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>`;
+  wrap.innerHTML = inner;
+  msgs.appendChild(wrap);
+  scrollBottom();
+  return wrap.querySelector(".msg-bubble");
+}
+
+// ─── Send message ─────────────────────────────────────────────────────────────
+async function sendMessage() {
+  if (isStreaming) return;
+  const inputEl = document.getElementById("userInput");
+  const text     = inputEl.value.trim();
+  const files    = [...pendingFiles];
+  if (!text && !files.length) return;
+  if (tokensUsed >= TOKEN_LIMIT) return;
+
+  // Preview URLs for images
+  for (const f of files) {
+    if (f.type && f.type.startsWith("image/")) f._previewUrl = URL.createObjectURL(f);
+  }
+
+  // Show user message
+  appendMsg("user", md(text || (files.length === 1 ? files[0].name : files.length + " files")), files);
+
+  // Reset input
+  inputEl.value = "";
+  inputEl.style.height = "auto";
+  pendingFiles = [];
+  renderQueue();
+  isStreaming = true;
+  checkSend();
+
+  // Build message for history
+  const userMsg = { role: "user", content: text || (files.length ? "[Attached files]" : "") };
+  history.push(userMsg);
+
+  // FormData — files sent as multipart, messages as JSON field
+  const fd = new FormData();
+  fd.append("messages", JSON.stringify(history));
+  for (const f of files) fd.append("files", f, f.name);
+
+  // Show typing dots
+  const msgs = document.getElementById("messages");
+  const typingWrap = document.createElement("div");
+  typingWrap.className = "msg assistant";
+  typingWrap.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(typingWrap);
+  scrollBottom();
+
+  let accumulated = "";
+  let streamBubble = null;
+
+  try {
+    const res = await fetch(WORKER_URL + "?token=" + encodeURIComponent(WORKER_TOKEN), {
+      method: "POST",
+      body: fd
+    });
+
+    typingWrap.remove();
+
+    if (!res.ok) {
+      let errMsg = "Request failed (" + res.status + ").";
+      try { const j = await res.json(); errMsg = j.error || errMsg; } catch {}
+      throw new Error(errMsg);
+    }
+
+    // Create streaming bubble
+    const streamWrap = document.createElement("div");
+    streamWrap.className = "msg assistant";
+    streamWrap.innerHTML = `<div class="msg-bubble"><span class="cursor"></span></div>
+      <div class="msg-time">Menu Advisor · ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>`;
+    msgs.appendChild(streamWrap);
+    streamBubble = streamWrap.querySelector(".msg-bubble");
+    scrollBottom();
+
+    // Parse SSE
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+
+      // Split on double newline (SSE event separator)
+      const events = buf.split("\n\n");
+      buf = events.pop(); // keep trailing incomplete chunk
+
+      for (const evt of events) {
+        const dataLine = evt.split("\n").find(l => l.startsWith("data: "));
+        if (!dataLine) continue;
+        const raw = dataLine.slice(6).trim();
+        if (raw === "[DONE]") continue;
+
+        let p;
+        try { p = JSON.parse(raw); } catch { continue; }
+
+        // Anthropic streaming events
+        if (p.type === "content_block_delta" && p.delta?.type === "text_delta") {
+          accumulated += p.delta.text;
+          streamBubble.innerHTML = md(accumulated) + '<span class="cursor"></span>';
+          scrollBottom();
+        }
+
+        if (p.type === "message_start" && p.message?.usage) {
+          tokensUsed += (p.message.usage.input_tokens || 0);
+          updateTokenBar();
+        }
+
+        if (p.type === "message_delta" && p.usage) {
+          tokensUsed += (p.usage.output_tokens || 0);
+          updateTokenBar();
+        }
+
+        // Custom worker event
+        if (p.type === "fc_usage" && p.remaining_tokens !== undefined) {
+          updateTokenBar(TOKEN_LIMIT - p.remaining_tokens);
+        }
+      }
+    }
+
+    // Final — remove cursor
+    streamBubble.innerHTML = md(accumulated);
+    scrollBottom();
+    history.push({ role: "assistant", content: accumulated });
+
+  } catch (e) {
+    if (typingWrap.parentNode) typingWrap.remove();
+    if (streamBubble) {
+      streamBubble.innerHTML = `<em style="color:var(--fc-danger)">Error: ${esc(e.message)}</em>`;
+    } else {
+      appendMsg("assistant", `<em style="color:var(--fc-danger)">Error: ${esc(e.message)}</em>`);
+    }
+  }
+
+  isStreaming = false;
+  checkSend();
+}
+
+// ─── Drag and drop ────────────────────────────────────────────────────────────
+const overlay  = document.getElementById("dropOverlay");
+const ACCEPTED = /\.(jpe?g|png|gif|webp|pdf|xlsx|xls|csv)$/i;
+
+document.addEventListener("dragenter", e => { if (e.dataTransfer?.types?.includes("Files")) overlay.classList.add("active"); });
+document.addEventListener("dragleave", e => { if (!e.relatedTarget) overlay.classList.remove("active"); });
+document.addEventListener("dragover",  e => e.preventDefault());
+document.addEventListener("drop", e => {
+  e.preventDefault();
+  overlay.classList.remove("active");
+  for (const f of e.dataTransfer.files) {
+    if ((f.type && f.type.startsWith("image/")) || f.type === "application/pdf" || ACCEPTED.test(f.name)) addFile(f);
+  }
+});
+</script>
+</body>
+</html>
