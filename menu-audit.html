@@ -324,6 +324,10 @@ function inline(s) {
 }
 
 function md(text) {
+  // Strip any raw HTML tags Claude may have leaked into its output
+  // (e.g. </ul>, <ul>, </ol>, <li> as raw text)
+  text = text.replace(/<\/?(ul|ol|li|div|span|br|p)(\s[^>]*)?>/gi, "");
+
   const lines = text.split("\n");
   const out = [];
   let tableRows = [], inTable = false, headerDone = false;
@@ -359,11 +363,10 @@ function md(text) {
     .replace(/^## (.+)$/gm,  "<h3>$1</h3>")
     .replace(/^# (.+)$/gm,   "<h3>$1</h3>")
     .replace(/^---+$/gm, "<hr>")
-    .replace(/^[*-] (.+)$/gm, "<li>$1</li>")
-    .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
-    .replace(/(<li>[\s\S]*?<\/li>\n?)+/g, m => "<ul>" + m + "</ul>");
+    .replace(/^[*-] (.+)$/gm, (_, content) => `<li>${inline(content)}</li>`)
+    .replace(/^\d+\. (.+)$/gm, (_, content) => `<li>${inline(content)}</li>`)
+    .replace(/(<li>.*<\/li>\n?)+/g, m => "<ul>" + m + "</ul>");
 
-  // Paragraphs
   const segs = html.split("\n");
   const final = [];
   let para = [];
