@@ -409,6 +409,43 @@ function appendMsg(role, htmlContent, files) {
   return wrap.querySelector(".msg-bubble");
 }
 
+// ─── Image compression ────────────────────────────────────────────────────────
+// Compresses images client-side before upload to stay under Anthropic's 5MB limit
+async function compressImage(file, maxBytes = 4.5 * 1024 * 1024) {
+  if (file.size <= maxBytes) return file;
+  return new Promise(resolve => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement("canvas");
+      let { width, height } = img;
+      const maxDim = 2400;
+      if (width > maxDim || height > maxDim) {
+        const scale = maxDim / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      const tryCompress = (q) => {
+        canvas.toBlob(blob => {
+          if (!blob) { resolve(file); return; }
+          if (blob.size <= maxBytes || q <= 0.4) {
+            resolve(new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" }));
+          } else {
+            tryCompress(q - 0.1);
+          }
+        }, "image/jpeg", q);
+      };
+      tryCompress(0.85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
 // ─── Send message ─────────────────────────────────────────────────────────────
 async function sendMessage() {
   if (isStreaming) return;
@@ -436,7 +473,14 @@ async function sendMessage() {
 
   const fd = new FormData();
   fd.append("messages", JSON.stringify(history));
-  for (const f of files) fd.append("files", f, f.name);
+  for (const f of files) {
+    if (f.type && f.type.startsWith("image/")) {
+      const compressed = await compressImage(f);
+      fd.append("files", compressed, compressed.name);
+    } else {
+      fd.append("files", f, f.name);
+    }
+  }
 
   const msgs = document.getElementById("messages");
   const typingWrap = document.createElement("div");
