@@ -4,147 +4,476 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Menu Audit — Foodie Coaches</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
 
   :root {
-    --fc-green: #2D6A4F;
-    --fc-green-light: #40916C;
-    --fc-green-pale: #D8F3DC;
-    --fc-green-dark: #1B4332;
-    --fc-cream: #FAFAF7;
-    --fc-border: #E8E8E2;
-    --fc-text: #1C1C1A;
-    --fc-muted: #6B6B65;
-    --fc-white: #FFFFFF;
-    --fc-danger: #C53030;
-    --fc-warning-bg: #FFF8E1;
-    --fc-warning-border: #F9C846;
-    --fc-warning-text: #7B5E0F;
+    --gold:         #F2A900;
+    --gold-dim:     rgba(242,169,0,0.10);
+    --black:        #0D0D0D;
+    --cream:        #FAF7F2;
+    --cream2:       #F2EDE4;
+    --cream3:       #E8E0D4;
+    --muted:        #8C8075;
+    --text:         #2A2420;
+    --border:       rgba(13,13,13,0.08);
+    --border-med:   rgba(13,13,13,0.14);
+    --white:        #ffffff;
+    --danger:       #C04B28;
+
+    --c-teal:        #0E8A6E;
+    --c-teal-bg:     #E6F5F1;
+    --c-teal-border: rgba(14,138,110,0.15);
+    --c-teal-text:   #0a4a3a;
+
+    --c-amber:        #9E6800;
+    --c-amber-bg:     #FDF3DC;
+    --c-amber-border: rgba(158,104,0,0.15);
+    --c-amber-text:   #5a3c00;
+
+    --c-coral:        #C04B28;
+    --c-coral-bg:     #FAECE7;
+    --c-coral-border: rgba(192,75,40,0.15);
+    --c-coral-text:   #6b2510;
   }
 
-  html, body { height: 100%; font-family: Georgia, 'Times New Roman', serif; background: var(--fc-cream); color: var(--fc-text); }
-  .app { display: flex; flex-direction: column; height: 100vh; max-width: 860px; margin: 0 auto; }
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    background-image:
+      radial-gradient(ellipse at 0% 0%, rgba(242,169,0,0.07) 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(242,169,0,0.04) 0%, transparent 50%);
+  }
 
-  .header { padding: 16px 22px 13px; border-bottom: 1px solid var(--fc-border); background: var(--fc-white); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-  .logo-mark { width: 34px; height: 34px; background: var(--fc-green); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .header-text h1 { font-size: 15px; font-weight: 700; font-family: Georgia, serif; letter-spacing: -0.2px; }
-  .header-text p { font-size: 11px; color: var(--fc-muted); font-family: -apple-system, 'Helvetica Neue', sans-serif; margin-top: 1px; letter-spacing: 0.3px; text-transform: uppercase; }
-  .header-badge { margin-left: auto; font-size: 10px; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: var(--fc-green); background: var(--fc-green-pale); padding: 3px 9px; border-radius: 20px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; }
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 860px;
+    margin: 0 auto;
+  }
 
-  .messages { flex: 1; overflow-y: auto; padding: 26px 22px 14px; display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth; }
+  /* ── HEADER ── */
+  .header {
+    padding: 14px 22px 12px;
+    border-bottom: 1px solid var(--border-med);
+    background: rgba(250,247,242,0.95);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+
+  .logo-svg { height: 26px; width: auto; flex-shrink: 0; }
+
+  .header-rule { flex: 1; height: 1px; background: var(--border-med); }
+
+  .header-badge {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-amber);
+    background: var(--c-amber-bg);
+    border: 1px solid var(--c-amber-border);
+    padding: 3px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  /* ── MESSAGES ── */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 22px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+  }
   .messages::-webkit-scrollbar { width: 4px; }
-  .messages::-webkit-scrollbar-thumb { background: var(--fc-border); border-radius: 2px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--cream3); border-radius: 2px; }
 
-  .token-bar { flex-shrink: 0; padding: 5px 22px; background: var(--fc-white); border-top: 1px solid var(--fc-border); display: flex; align-items: center; gap: 8px; }
-  .token-label { font-size: 11px; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: var(--fc-muted); flex-shrink: 0; }
-  .token-track { flex: 1; height: 3px; background: var(--fc-border); border-radius: 2px; overflow: hidden; }
-  .token-fill { height: 100%; background: var(--fc-green); border-radius: 2px; transition: width 0.5s ease; }
-  .token-fill.warn { background: #D69E2E; }
-  .token-fill.danger { background: var(--fc-danger); }
-  .token-count { font-size: 11px; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: var(--fc-muted); flex-shrink: 0; min-width: 82px; text-align: right; }
+  /* ── TOKEN BAR ── */
+  .token-bar {
+    flex-shrink: 0;
+    padding: 5px 22px;
+    background: rgba(250,247,242,0.9);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .token-label {
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--muted);
+    flex-shrink: 0;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .token-track { flex: 1; height: 3px; background: var(--cream3); border-radius: 2px; overflow: hidden; }
+  .token-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.5s ease; }
+  .token-fill.warn { background: var(--c-amber); }
+  .token-fill.danger { background: var(--danger); }
+  .token-count {
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--muted);
+    flex-shrink: 0;
+    min-width: 82px;
+    text-align: right;
+  }
 
+  /* ── MESSAGE BUBBLES ── */
   .msg { display: flex; flex-direction: column; max-width: 88%; }
   .msg.user { align-self: flex-end; align-items: flex-end; }
   .msg.assistant { align-self: flex-start; align-items: flex-start; }
 
-  .msg-bubble { padding: 12px 15px; border-radius: 14px; font-size: 14.5px; line-height: 1.65; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
-  .msg.user .msg-bubble { background: var(--fc-green); color: #fff; border-bottom-right-radius: 4px; }
-  .msg.assistant .msg-bubble { background: var(--fc-white); border: 1px solid var(--fc-border); color: var(--fc-text); border-bottom-left-radius: 4px; }
+  .msg-bubble {
+    padding: 13px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.7;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+  }
+  .msg.user .msg-bubble {
+    background: var(--black);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.assistant .msg-bubble {
+    background: var(--white);
+    border: 1px solid var(--border-med);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 6px rgba(13,13,13,0.04);
+  }
 
   .msg-bubble p { margin: 0 0 9px; }
   .msg-bubble p:last-child { margin-bottom: 0; }
-  .msg-bubble strong { font-weight: 600; }
-  .msg-bubble em { font-style: italic; }
-  .msg-bubble code { font-family: monospace; font-size: 13px; background: var(--fc-cream); padding: 1px 4px; border-radius: 3px; }
-  .msg-bubble h3 { font-family: Georgia, serif; font-size: 14.5px; font-weight: 700; margin: 15px 0 7px; color: var(--fc-green-dark); padding-bottom: 4px; border-bottom: 1px solid var(--fc-border); }
+  .msg-bubble strong { font-weight: 500; }
+  .msg-bubble em { font-style: italic; font-weight: 300; }
+  .msg-bubble code { font-family: monospace; font-size: 13px; background: var(--cream2); padding: 1px 5px; border-radius: 3px; }
+  .msg-bubble h3 {
+    font-family: 'Khand', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin: 16px 0 7px;
+    color: var(--black);
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+  }
   .msg-bubble h3:first-child { margin-top: 0; }
   .msg-bubble ul, .msg-bubble ol { padding-left: 18px; margin: 5px 0; }
-  .msg-bubble li { margin-bottom: 4px; }
-  .msg-bubble hr { border: none; border-top: 1px solid var(--fc-border); margin: 11px 0; }
+  .msg-bubble li { margin-bottom: 4px; font-weight: 300; }
+  .msg-bubble hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
   .msg-bubble table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 10px 0; }
-  .msg-bubble th { background: var(--fc-green-pale); color: var(--fc-green-dark); font-weight: 600; padding: 6px 9px; text-align: left; border: 1px solid #B7E4C7; }
-  .msg-bubble td { padding: 5px 9px; border: 1px solid var(--fc-border); vertical-align: top; }
-  .msg-bubble tr:nth-child(even) td { background: #FAFAFA; }
-  .msg-time { font-size: 10.5px; color: var(--fc-muted); font-family: -apple-system, 'Helvetica Neue', sans-serif; margin-top: 4px; padding: 0 3px; }
+  .msg-bubble th {
+    background: var(--c-amber-bg);
+    color: var(--c-amber-text);
+    font-weight: 600;
+    font-family: 'Khand', sans-serif;
+    letter-spacing: 0.05em;
+    padding: 7px 10px;
+    text-align: left;
+    border: 1px solid var(--c-amber-border);
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+  .msg-bubble td { padding: 6px 10px; border: 1px solid var(--border); vertical-align: top; font-weight: 300; }
+  .msg-bubble tr:nth-child(even) td { background: var(--cream); }
 
-  .cursor { display: inline-block; width: 2px; height: 14px; background: var(--fc-green); margin-left: 2px; vertical-align: text-bottom; animation: blink 0.8s step-end infinite; }
+  .msg-time {
+    font-size: 10.5px;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    margin-top: 5px;
+    padding: 0 4px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── CURSOR ── */
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background: var(--gold);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink 0.8s step-end infinite;
+  }
   @keyframes blink { 50% { opacity: 0; } }
 
-  .typing { display: flex; align-items: center; gap: 5px; padding: 12px 15px; background: var(--fc-white); border: 1px solid var(--fc-border); border-radius: 14px; border-bottom-left-radius: 4px; }
-  .typing span { width: 6px; height: 6px; background: var(--fc-green-light); border-radius: 50%; animation: bounce 1.2s infinite; }
+  /* ── TYPING INDICATOR ── */
+  .typing {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 13px 16px;
+    background: var(--white);
+    border: 1px solid var(--border-med);
+    border-radius: 14px;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 6px rgba(13,13,13,0.04);
+  }
+  .typing span {
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+    opacity: 0.7;
+  }
   .typing span:nth-child(2) { animation-delay: 0.2s; }
   .typing span:nth-child(3) { animation-delay: 0.4s; }
   @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
 
-  .attach-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 6px; max-width: 480px; }
-  .attach-chip { display: flex; align-items: center; gap: 5px; background: var(--fc-white); border: 1px solid var(--fc-border); border-radius: 8px; padding: 4px 9px; font-size: 12px; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: var(--fc-text); max-width: 200px; }
+  /* ── ATTACHMENTS ── */
+  .attach-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 7px; max-width: 480px; }
+  .attach-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--white);
+    border: 1px solid var(--border-med);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    color: var(--text);
+    max-width: 200px;
+  }
   .attach-chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .attach-img-preview { max-width: 240px; max-height: 160px; border-radius: 10px; border: 1px solid var(--fc-border); object-fit: cover; }
+  .attach-img-preview {
+    max-width: 240px;
+    max-height: 160px;
+    border-radius: 10px;
+    border: 1px solid var(--border-med);
+    object-fit: cover;
+  }
 
-  .input-area { flex-shrink: 0; padding: 10px 15px 15px; background: var(--fc-white); border-top: 1px solid var(--fc-border); }
-  .limit-warning { background: var(--fc-warning-bg); border: 1px solid var(--fc-warning-border); border-radius: 9px; padding: 9px 12px; font-size: 13px; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: var(--fc-warning-text); margin-bottom: 8px; }
+  /* ── INTRO BUBBLE ── */
+  .intro-bubble {
+    background: linear-gradient(135deg, var(--c-amber-bg), rgba(253,243,220,0.6)) !important;
+    border-color: var(--c-amber-border) !important;
+  }
+  .intro-bubble strong { color: var(--black); }
+
+  /* ── INPUT AREA ── */
+  .input-area {
+    flex-shrink: 0;
+    padding: 10px 15px 16px;
+    background: rgba(250,247,242,0.95);
+    border-top: 1px solid var(--border-med);
+  }
+
+  .limit-warning {
+    background: var(--c-coral-bg);
+    border: 1px solid var(--c-coral-border);
+    border-radius: 9px;
+    padding: 9px 13px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--c-coral-text);
+    margin-bottom: 9px;
+  }
+
   .file-queue { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
-  .file-queue-item { display: flex; align-items: center; gap: 5px; background: var(--fc-cream); border: 1px solid var(--fc-border); border-radius: 8px; padding: 4px 9px; font-size: 12px; font-family: -apple-system, 'Helvetica Neue', sans-serif; }
-  .file-queue-item button { background: none; border: none; cursor: pointer; color: var(--fc-muted); font-size: 15px; padding: 0; line-height: 1; }
-  .file-queue-item button:hover { color: var(--fc-danger); }
+  .file-queue-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--cream2);
+    border: 1px solid var(--border-med);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+  }
+  .file-queue-item button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 15px;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .file-queue-item button:hover { color: var(--danger); }
 
   .input-row { display: flex; gap: 8px; align-items: flex-end; }
-  .input-box { flex: 1; display: flex; align-items: flex-end; gap: 7px; background: var(--fc-cream); border: 1.5px solid var(--fc-border); border-radius: 12px; padding: 7px 10px; transition: border-color 0.15s; }
-  .input-box:focus-within { border-color: var(--fc-green); background: var(--fc-white); }
-  .attach-btn { background: none; border: none; cursor: pointer; color: var(--fc-muted); padding: 2px; display: flex; align-items: center; flex-shrink: 0; transition: color 0.15s; }
-  .attach-btn:hover { color: var(--fc-green); }
-  .paste-btn { background: none; border: 1px solid var(--fc-border); border-radius: 8px; cursor: pointer; color: var(--fc-muted); padding: 4px 9px; font-size: 12px; font-family: -apple-system, 'Helvetica Neue', sans-serif; display: flex; align-items: center; gap: 5px; flex-shrink: 0; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
-  .paste-btn:hover { color: var(--fc-green); border-color: var(--fc-green); }
+
+  .input-box {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 7px;
+    background: var(--white);
+    border: 1.5px solid var(--border-med);
+    border-radius: 12px;
+    padding: 8px 11px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .input-box:focus-within {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(242,169,0,0.12);
+  }
+
+  .attach-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+  .attach-btn:hover { color: var(--gold); }
+
+  .paste-btn {
+    background: none;
+    border: 1px solid var(--border-med);
+    border-radius: 7px;
+    cursor: pointer;
+    color: var(--muted);
+    padding: 4px 9px;
+    font-size: 11.5px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .paste-btn:hover { color: var(--gold); border-color: rgba(242,169,0,0.4); }
   .paste-btn svg { flex-shrink: 0; }
-  textarea { flex: 1; border: none; background: none; resize: none; font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 14px; color: var(--fc-text); outline: none; line-height: 1.5; max-height: 120px; min-height: 20px; padding: 0; }
-  textarea::placeholder { color: var(--fc-muted); }
-  .send-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--fc-green); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, transform 0.1s; }
-  .send-btn:hover { background: var(--fc-green-dark); }
-  .send-btn:active { transform: scale(0.95); }
-  .send-btn:disabled { background: var(--fc-border); cursor: not-allowed; }
+
+  textarea {
+    flex: 1;
+    border: none;
+    background: none;
+    resize: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text);
+    outline: none;
+    line-height: 1.5;
+    max-height: 120px;
+    min-height: 20px;
+    padding: 0;
+  }
+  textarea::placeholder { color: var(--muted); font-weight: 300; }
+
+  .send-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--gold);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    box-shadow: 0 2px 10px rgba(242,169,0,0.35);
+  }
+  .send-btn:hover {
+    background: #d9940a;
+    box-shadow: 0 4px 16px rgba(242,169,0,0.45);
+    transform: translateY(-1px);
+  }
+  .send-btn:active { transform: scale(0.95); box-shadow: none; }
+  .send-btn:disabled {
+    background: var(--cream3);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+  .send-btn:disabled svg { opacity: 0.4; }
 
   input[type="file"] { display: none; }
 
-  .drop-overlay { position: fixed; inset: 0; background: rgba(45,106,79,0.08); border: 3px dashed var(--fc-green); border-radius: 12px; display: none; align-items: center; justify-content: center; z-index: 100; pointer-events: none; }
+  /* ── DROP OVERLAY ── */
+  .drop-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(242,169,0,0.06);
+    border: 3px dashed var(--gold);
+    border-radius: 12px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    pointer-events: none;
+    backdrop-filter: blur(2px);
+  }
   .drop-overlay.active { display: flex; }
-  .drop-overlay-text { font-size: 18px; font-family: Georgia, serif; color: var(--fc-green); font-weight: 700; }
+  .drop-overlay-text {
+    font-family: 'Khand', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+  }
 
-  .intro-bubble { background: linear-gradient(135deg, #F0FFF4, #E8F5E9) !important; border-color: #B7E4C7 !important; }
+  /* ── FADE IN ── */
+  .fade-in { animation: fadeUp 0.4s cubic-bezier(0.4,0,0.2,1) both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
 
 <div class="app">
+
+  <!-- HEADER -->
   <div class="header">
-    <div class="logo-mark">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path d="M12 3C8 3 5 6 5 9c0 2.5 1.5 4.5 3.5 5.5L8 20h8l-.5-5.5C17.5 13.5 19 11.5 19 9c0-3-3-6-7-6z" fill="white" opacity="0.9"/>
-        <path d="M9 20h6M10 17h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <div class="header-text">
-      <h1>Menu Audit</h1>
-      <p>Foodie Coaches — Menu Optimisation</p>
-    </div>
-    <div class="header-badge">AI-Powered</div>
+    <svg class="logo-svg" viewBox="0 0 457 54" xmlns="http://www.w3.org/2000/svg"><g transform="matrix(1.3333333,0,0,-1.3333333,0,53.716667)"><defs><clipPath id="fcc"><path d="M 0,40.288 H 343.057 V 0 H 0 Z"/></clipPath></defs><g clip-path="url(#fcc)"><path d="M 18.66,21.613 H 17.677 V 18.64 h 0.983 z m 4.276,5.79 h 2.909 v 2.062 c -1.094,-0.523 -2.046,-1.19 -2.909,-2.062 m -5.263,-4.479 c 0.404,0 0.782,-0.007 1.16,0.008 0.056,0.002 0.139,0.098 0.158,0.166 0.268,0.985 0.652,1.922 1.156,2.808 0.028,0.048 0.045,0.101 0.07,0.157 h -2.544 z m 5.486,-4.284 c -0.206,1 -0.197,1.983 -0.004,2.975 h -3.123 c -0.143,-0.997 -0.15,-1.982 0.003,-2.975 z m -6.812,7.424 h -2.952 v -3.123 h 2.952 z m 9.738,-0.006 c -0.084,0.012 -0.113,0.021 -0.141,0.021 -1.329,0 -2.658,0.003 -3.986,-0.005 -0.08,-0.001 -0.188,-0.066 -0.231,-0.134 -0.242,-0.385 -0.498,-0.766 -0.693,-1.174 -0.278,-0.585 -0.507,-1.194 -0.762,-1.802 0.087,-0.025 0.108,-0.037 0.128,-0.037 1.01,-0.002 2.02,-0.006 3.03,0.004 0.07,0.001 0.163,0.087 0.205,0.157 0.258,0.428 0.48,0.879 0.76,1.291 0.441,0.651 1.011,1.187 1.69,1.679 m -1.425,4.293 h -6.983 v -2.954 c 0.048,-0.004 0.084,-0.01 0.12,-0.01 1.071,0 2.142,-0.004 3.212,0.006 0.088,0.001 0.2,0.065 0.258,0.135 0.904,1.083 1.963,1.982 3.184,2.69 0.055,0.033 0.109,0.069 0.209,0.133 M 13.395,9.89 h 2.948 v 7.421 h -2.948 z m 21.718,15.638 c 0.776,0.654 1.555,1.311 2.349,1.982 -1.605,1.534 -3.471,2.479 -5.633,2.823 -1.583,0.252 -3.14,0.132 -4.661,-0.35 v -3.27 c 2.885,1.171 5.529,0.803 7.945,-1.185 M 20.329,17.313 c 0.858,-3.215 3.672,-6.513 7.959,-7.321 3.5,-0.659 6.542,0.338 9.186,2.744 -0.814,0.686 -1.589,1.34 -2.371,2 -0.119,-0.097 -0.223,-0.185 -0.329,-0.269 -1.628,-1.287 -3.486,-1.813 -5.527,-1.508 -2.592,0.386 -4.452,1.817 -5.59,4.177 -0.072,0.149 -0.152,0.192 -0.307,0.191 -0.935,-0.007 -1.87,-0.003 -2.804,-0.004 -0.067,0 -0.134,-0.005 -0.217,-0.01 M 39.354,12.869 C 38.298,11.59 37.073,10.564 35.626,9.81 33.663,8.787 31.574,8.353 29.373,8.522 c -2.741,0.212 -5.121,1.274 -7.122,3.161 -1.602,1.511 -2.68,3.341 -3.252,5.468 -0.028,0.105 -0.053,0.177 -0.186,0.175 -0.372,-0.007 -0.744,-0.003 -1.144,-0.003 v -8.72 h -5.586 v 10.022 h 4.262 v 2.997 h -4.26 v 5.757 h 4.266 v 4.276 h 10.794 c 0.008,-0.095 0.015,-0.185 0.022,-0.268 4.852,1.091 8.897,-0.253 12.209,-3.983 -1.469,-1.239 -2.911,-2.456 -4.362,-3.681 -0.201,0.211 -0.386,0.411 -0.578,0.603 -2.869,2.869 -7.707,2.069 -9.502,-1.575 -0.055,-0.111 -0.087,-0.245 -0.087,-0.369 -0.006,-1.504 -0.006,-3.009 0,-4.514 0,-0.124 0.034,-0.257 0.089,-0.368 1.834,-3.726 6.846,-4.453 9.663,-1.405 0.133,0.144 0.27,0.286 0.414,0.437 1.448,-1.221 2.886,-2.435 4.341,-3.663" fill="#3b4443" fill-rule="nonzero"/><text transform="matrix(1,0,0,-1,46.7861,9.1406)" style="font-size:30.6746px;font-family:'Brandon Grotesque','Futura','Century Gothic','DM Sans',sans-serif;font-weight:500;fill:#3b4443;">FOODIE </text><text transform="matrix(1,0,0,-1,178.16541,9.1406)" style="font-size:30.6746px;font-family:'Brandon Grotesque','Futura','Century Gothic','DM Sans',sans-serif;font-weight:800;fill:#3b4443;">COACHES</text></g></g></svg>
+    <div class="header-rule"></div>
+    <div class="header-badge">Menu Audit</div>
   </div>
 
+  <!-- MESSAGES -->
   <div class="messages" id="messages">
-    <div class="msg assistant">
+    <div class="msg assistant fade-in">
       <div class="msg-bubble intro-bubble">
-        Upload your menu — photo, scan, PDF, or spreadsheet — and I'll audit it across five areas: strategic item selection, pricing, psychology, layout, and upsell opportunities.<br><br>You'll get a prioritised action list you can act on this week. Use the paperclip to attach files, the <strong>Paste image</strong> button to paste a screenshot from your clipboard, or drag and drop files directly in.
+        Upload your menu — photo, scan, PDF, or spreadsheet — and I'll audit it across five areas: strategic item selection, pricing, psychology, layout, and upsell opportunities.<br><br>
+        You'll get a prioritised action list you can act on this week. Use the paperclip to attach files, the <strong>Paste image</strong> button to paste a screenshot from your clipboard, or drag and drop files directly in.
       </div>
       <div class="msg-time">Menu Advisor</div>
     </div>
   </div>
 
+  <!-- TOKEN BAR -->
   <div class="token-bar">
     <span class="token-label">Session</span>
     <div class="token-track"><div class="token-fill" id="tokenFill" style="width:0%"></div></div>
     <span class="token-count" id="tokenCount">0 / 100k tokens</span>
   </div>
 
+  <!-- INPUT AREA -->
   <div class="input-area">
     <div id="limitWarning" class="limit-warning" style="display:none">
       You're approaching the session limit. Start a new conversation to continue.
@@ -170,7 +499,7 @@
           onpaste="handlePaste(event)"></textarea>
       </div>
       <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled title="Send">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--black)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
         </svg>
       </button>
@@ -295,14 +624,14 @@ function removeFile(i) {
 function renderQueue() {
   const c = document.getElementById("fileQueue");
   c.innerHTML = pendingFiles.map((f, i) => {
-    const icon = f.type && f.type.startsWith("image/") ? "🖼"
-      : /\.(xlsx|xls|csv)$/i.test(f.name) ? "📊"
-      : /\.pdf$/i.test(f.name) ? "📄" : "📎";
-    return `<div class="file-queue-item">
-      <span>${icon}</span>
-      <span style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span>
-      <button onclick="removeFile(${i})" title="Remove">×</button>
-    </div>`;
+    const icon = f.type && f.type.startsWith("image/") ? "\uD83D\uDDBC"
+      : /\.(xlsx|xls|csv)$/i.test(f.name) ? "\uD83D\uDCCA"
+      : /\.pdf$/i.test(f.name) ? "\uD83D\uDCC4" : "\uD83D\uDCCE";
+    return '<div class="file-queue-item">'
+      + '<span>' + icon + '</span>'
+      + '<span style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(f.name) + '</span>'
+      + '<button onclick="removeFile(' + i + ')" title="Remove">\u00D7</button>'
+      + '</div>';
   }).join("");
 }
 
@@ -318,11 +647,7 @@ function inline(s) {
     .replace(/`([^`\n]+)`/g, "<code>$1</code>");
 }
 
-// FIX: rewritten md() function
-// - Strips stray HTML tags Claude occasionally outputs (</ul>, <ul>, </ol> etc.)
-// - List items now run through inline() so **bold** renders correctly inside bullets
 function md(text) {
-  // Strip any raw HTML tags Claude may have leaked into its output
   text = text.replace(/<\/?(ul|ol|li|div|span|br|p)(\s[^>]*)?>/gi, "");
 
   const lines = text.split("\n");
@@ -346,7 +671,7 @@ function md(text) {
       inTable = true;
       const cells = line.slice(1,-1).split("|").map(c => c.trim());
       const tag = headerDone ? "td" : "th";
-      tableRows.push("<tr>" + cells.map(c => `<${tag}>${inline(c)}</${tag}>`).join("") + "</tr>");
+      tableRows.push("<tr>" + cells.map(c => "<" + tag + ">" + inline(c) + "</" + tag + ">").join("") + "</tr>");
       continue;
     }
 
@@ -360,15 +685,14 @@ function md(text) {
     .replace(/^## (.+)$/gm,  "<h3>$1</h3>")
     .replace(/^# (.+)$/gm,   "<h3>$1</h3>")
     .replace(/^---+$/gm, "<hr>")
-    // FIX: list items now pass content through inline() so bold/italic renders
-    .replace(/^[*-] (.+)$/gm, (_, content) => `<li>${inline(content)}</li>`)
-    .replace(/^\d+\. (.+)$/gm, (_, content) => `<li>${inline(content)}</li>`)
-    .replace(/(<li>.*<\/li>\n?)+/g, m => "<ul>" + m + "</ul>");
+    .replace(/^[*-] (.+)$/gm, function(_, content) { return "<li>" + inline(content) + "</li>"; })
+    .replace(/^\d+\. (.+)$/gm, function(_, content) { return "<li>" + inline(content) + "</li>"; })
+    .replace(/(<li>.*<\/li>\n?)+/g, function(m) { return "<ul>" + m + "</ul>"; });
 
   const segs = html.split("\n");
   const final = [];
   let para = [];
-  const isBlock = s => /^<(h[123]|ul|ol|li|hr|table|tr|th|td)/.test(s.trim()) || s.trim() === "";
+  const isBlock = function(s) { return /^<(h[123]|ul|ol|li|hr|table|tr|th|td)/.test(s.trim()) || s.trim() === ""; };
 
   for (const seg of segs) {
     if (isBlock(seg)) {
@@ -386,23 +710,23 @@ function md(text) {
 function appendMsg(role, htmlContent, files) {
   const msgs = document.getElementById("messages");
   const wrap = document.createElement("div");
-  wrap.className = "msg " + role;
+  wrap.className = "msg " + role + " fade-in";
 
   let inner = "";
   if (files && files.length) {
     inner += '<div class="attach-row">';
     for (const f of files) {
       if (f._previewUrl) {
-        inner += `<img class="attach-img-preview" src="${f._previewUrl}" alt="${esc(f.name)}">`;
+        inner += '<img class="attach-img-preview" src="' + f._previewUrl + '" alt="' + esc(f.name) + '">';
       } else {
-        const icon = /\.(xlsx|xls|csv)$/i.test(f.name) ? "📊" : /\.pdf$/i.test(f.name) ? "📄" : "📎";
-        inner += `<div class="attach-chip"><span>${icon}</span><span class="attach-chip-name">${esc(f.name)}</span></div>`;
+        const icon = /\.(xlsx|xls|csv)$/i.test(f.name) ? "\uD83D\uDCCA" : /\.pdf$/i.test(f.name) ? "\uD83D\uDCC4" : "\uD83D\uDCCE";
+        inner += '<div class="attach-chip"><span>' + icon + '</span><span class="attach-chip-name">' + esc(f.name) + '</span></div>';
       }
     }
     inner += "</div>";
   }
-  inner += `<div class="msg-bubble">${htmlContent}</div>`;
-  inner += `<div class="msg-time">${role === "user" ? "You" : "Menu Advisor"} · ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>`;
+  inner += '<div class="msg-bubble">' + htmlContent + '</div>';
+  inner += '<div class="msg-time">' + (role === "user" ? "You" : "Menu Advisor") + ' \u00B7 ' + new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) + '</div>';
   wrap.innerHTML = inner;
   msgs.appendChild(wrap);
   scrollBottom();
@@ -410,16 +734,17 @@ function appendMsg(role, htmlContent, files) {
 }
 
 // ─── Image compression ────────────────────────────────────────────────────────
-// Compresses images client-side before upload to stay under Anthropic's 5MB limit
-async function compressImage(file, maxBytes = 4.5 * 1024 * 1024) {
+async function compressImage(file, maxBytes) {
+  maxBytes = maxBytes || 4.5 * 1024 * 1024;
   if (file.size <= maxBytes) return file;
-  return new Promise(resolve => {
+  return new Promise(function(resolve) {
     const img = new Image();
     const url = URL.createObjectURL(file);
-    img.onload = () => {
+    img.onload = function() {
       URL.revokeObjectURL(url);
       const canvas = document.createElement("canvas");
-      let { width, height } = img;
+      let width = img.width;
+      let height = img.height;
       const maxDim = 2400;
       if (width > maxDim || height > maxDim) {
         const scale = maxDim / Math.max(width, height);
@@ -429,8 +754,8 @@ async function compressImage(file, maxBytes = 4.5 * 1024 * 1024) {
       canvas.width = width;
       canvas.height = height;
       canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-      const tryCompress = (q) => {
-        canvas.toBlob(blob => {
+      const tryCompress = function(q) {
+        canvas.toBlob(function(blob) {
           if (!blob) { resolve(file); return; }
           if (blob.size <= maxBytes || q <= 0.4) {
             resolve(new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" }));
@@ -441,7 +766,7 @@ async function compressImage(file, maxBytes = 4.5 * 1024 * 1024) {
       };
       tryCompress(0.85);
     };
-    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.onerror = function() { URL.revokeObjectURL(url); resolve(file); };
     img.src = url;
   });
 }
@@ -502,14 +827,14 @@ async function sendMessage() {
 
     if (!res.ok) {
       let errMsg = "Request failed (" + res.status + ").";
-      try { const j = await res.json(); errMsg = j.error || errMsg; } catch {}
+      try { const j = await res.json(); errMsg = j.error || errMsg; } catch(e) {}
       throw new Error(errMsg);
     }
 
     const streamWrap = document.createElement("div");
-    streamWrap.className = "msg assistant";
-    streamWrap.innerHTML = `<div class="msg-bubble"><span class="cursor"></span></div>
-      <div class="msg-time">Menu Advisor · ${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>`;
+    streamWrap.className = "msg assistant fade-in";
+    streamWrap.innerHTML = '<div class="msg-bubble"><span class="cursor"></span></div>'
+      + '<div class="msg-time">Menu Advisor \u00B7 ' + new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) + '</div>';
     msgs.appendChild(streamWrap);
     streamBubble = streamWrap.querySelector(".msg-bubble");
     scrollBottom();
@@ -527,21 +852,21 @@ async function sendMessage() {
       buf = events.pop();
 
       for (const evt of events) {
-        const dataLine = evt.split("\n").find(l => l.startsWith("data: "));
+        const dataLine = evt.split("\n").find(function(l) { return l.startsWith("data: "); });
         if (!dataLine) continue;
         const raw = dataLine.slice(6).trim();
         if (raw === "[DONE]") continue;
 
         let p;
-        try { p = JSON.parse(raw); } catch { continue; }
+        try { p = JSON.parse(raw); } catch(e) { continue; }
 
-        if (p.type === "content_block_delta" && p.delta?.type === "text_delta") {
+        if (p.type === "content_block_delta" && p.delta && p.delta.type === "text_delta") {
           accumulated += p.delta.text;
           streamBubble.innerHTML = md(accumulated) + '<span class="cursor"></span>';
           scrollBottom();
         }
 
-        if (p.type === "message_start" && p.message?.usage) {
+        if (p.type === "message_start" && p.message && p.message.usage) {
           tokensUsed += (p.message.usage.input_tokens || 0);
           updateTokenBar();
         }
@@ -564,9 +889,9 @@ async function sendMessage() {
   } catch (e) {
     if (typingWrap.parentNode) typingWrap.remove();
     if (streamBubble) {
-      streamBubble.innerHTML = `<em style="color:var(--fc-danger)">Error: ${esc(e.message)}</em>`;
+      streamBubble.innerHTML = '<em style="color:var(--danger)">Error: ' + esc(e.message) + '</em>';
     } else {
-      appendMsg("assistant", `<em style="color:var(--fc-danger)">Error: ${esc(e.message)}</em>`);
+      appendMsg("assistant", '<em style="color:var(--danger)">Error: ' + esc(e.message) + '</em>');
     }
   }
 
@@ -581,10 +906,10 @@ window.addEventListener('load', checkSend);
 const overlay  = document.getElementById("dropOverlay");
 const ACCEPTED = /\.(jpe?g|png|gif|webp|pdf|xlsx|xls|csv)$/i;
 
-document.addEventListener("dragenter", e => { if (e.dataTransfer?.types?.includes("Files")) overlay.classList.add("active"); });
-document.addEventListener("dragleave", e => { if (!e.relatedTarget) overlay.classList.remove("active"); });
-document.addEventListener("dragover",  e => e.preventDefault());
-document.addEventListener("drop", e => {
+document.addEventListener("dragenter", function(e) { if (e.dataTransfer && e.dataTransfer.types && e.dataTransfer.types.includes("Files")) overlay.classList.add("active"); });
+document.addEventListener("dragleave", function(e) { if (!e.relatedTarget) overlay.classList.remove("active"); });
+document.addEventListener("dragover",  function(e) { e.preventDefault(); });
+document.addEventListener("drop", function(e) {
   e.preventDefault();
   overlay.classList.remove("active");
   for (const f of e.dataTransfer.files) {
