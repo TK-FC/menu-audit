@@ -519,8 +519,9 @@ const WORKER_URL   = "https://menu-audit-worker.tim-475.workers.dev";
 const WORKER_TOKEN = "I0l6TOjQFqpPSfUVC2JricKNZBD7M4Y9mXu1LWb5";
 
 // ─── State ────────────────────────────────────────────────────────────────────
-const TOKEN_LIMIT = 100_000;
-const TOKEN_WARN  =  80_000;
+const TOKEN_LIMIT    = 100_000;
+const TOKEN_WARN     =  80_000;
+const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10MB per file
 let history      = [];
 let pendingFiles = [];
 let tokensUsed   = 0;
@@ -610,6 +611,11 @@ function handleFileSelect(e) {
 }
 
 function addFile(f) {
+  if (f.size > MAX_FILE_BYTES) {
+    const mb = (f.size / 1024 / 1024).toFixed(1);
+    appendMsg("assistant", '<em style="color:var(--danger)">File too large (' + mb + 'MB). Maximum file size is 10MB. For large PDFs, try exporting at a lower quality or split into smaller files.</em>');
+    return;
+  }
   pendingFiles.push(f);
   renderQueue();
   checkSend();
