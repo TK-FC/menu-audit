@@ -459,8 +459,9 @@
   <div class="messages" id="messages">
     <div class="msg assistant fade-in">
       <div class="msg-bubble intro-bubble">
-        Upload your menu — photo, scan, PDF, or spreadsheet — and I'll audit it across five areas: strategic item selection, pricing, psychology, layout, and upsell opportunities.<br><br>
-        You'll get a prioritised action list you can act on this week. Use the paperclip to attach files, the <strong>Paste image</strong> button to paste a screenshot from your clipboard, or drag and drop files directly in.
+        Upload your <strong>Menu</strong> — photo, scan, PDF, or spreadsheet — and I'll audit it across five areas: strategic item selection, pricing, psychology, layout, and upsell opportunities.<br><br>
+        You can also upload your <strong>Menu Change Calculator</strong> (with your sales data) to get even more tailored advice around menu placement and upsell opportunities.<br><br>
+        Use the paperclip to attach files, the <strong>Paste image</strong> button to paste a screenshot from your clipboard, or drag and drop files directly in.
       </div>
       <div class="msg-time">Menu Advisor</div>
     </div>
@@ -519,9 +520,8 @@ const WORKER_URL   = "https://menu-audit-worker.tim-475.workers.dev";
 const WORKER_TOKEN = "I0l6TOjQFqpPSfUVC2JricKNZBD7M4Y9mXu1LWb5";
 
 // ─── State ────────────────────────────────────────────────────────────────────
-const TOKEN_LIMIT    = 100_000;
-const TOKEN_WARN     =  80_000;
-const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10MB per file
+const TOKEN_LIMIT = 100_000;
+const TOKEN_WARN  =  80_000;
 let history      = [];
 let pendingFiles = [];
 let tokensUsed   = 0;
@@ -610,10 +610,18 @@ function handleFileSelect(e) {
   e.target.value = "";
 }
 
+const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10MB — matches worker limit
+
 function addFile(f) {
+  const isPDF = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
   if (f.size > MAX_FILE_BYTES) {
-    const mb = (f.size / 1024 / 1024).toFixed(1);
-    appendMsg("assistant", '<em style="color:var(--danger)">File too large (' + mb + 'MB). Maximum file size is 10MB. For large PDFs, try exporting at a lower quality or split into smaller files.</em>');
+    const mb = (f.size / (1024 * 1024)).toFixed(1);
+    const tip = isPDF
+      ? ' Take a screenshot of each page instead — open the PDF, zoom to fit, then use the <strong>Paste image</strong> button to drop each page straight in.'
+      : ' Try compressing the file before uploading.';
+    appendMsg("assistant",
+      '<em style="color:var(--c-coral)">File too large (' + mb + '\u00a0MB\u00a0\u2014\u00a0max\u00a010\u00a0MB).</em>' + tip
+    );
     return;
   }
   pendingFiles.push(f);
